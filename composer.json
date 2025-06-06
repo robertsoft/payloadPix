@@ -1,0 +1,19 @@
+{
+    "name": "robertsoft/pix",
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "description": "Biblioteca para geração do payload e QR Code estático do pix com PHP.",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Robert Soft",
+            "email": "robertsoft@robertsot.com.br"
+        }
+        ],
+    "require": {
+        "mpdf/qrcode": "^1.2"
+    }
+}

@@ -1,0 +1,12 @@
+/vendor/
+*.log
+*.cache
+*.tmp
+*.lock
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.env
+composer.lock
+node_modules/

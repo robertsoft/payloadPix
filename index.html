@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerar QR Code</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .qr-code {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .qr-code img {
+            max-width: 100%;
+            height: auto;
+        }
+        .btn-custom {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+        .alert {
+            margin-top: 20px;
+        }
+                /* Estilo para o campo valor */
+        #amount {
+            font-family: 'Courier New', Courier, monospace;
+            width: 340px;
+            font-size: 24px;
+            text-align: right;
+            background-color: #000;
+            color: #0f0;
+            border: 2px solid #333;
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+
+        #amount:focus {
+            outline: none;
+            box-shadow: 0 0 10px #0f0;
+        }
+
+    </style>
+    <script>
+        $(document).ready(function () {
+            // Adiciona um evento de foco ao campo com o ID especificado
+            $('#amount').focus(function () {
+                // Altera o tipo do campo para 'tel' quando ele recebe o foco
+                $(this).attr('type', 'tel');
+            });
+        });
+        // Formatação do campo de valor para moeda
+        // Adiciona o evento de formatação ao campo de valor
+        document.addEventListener('DOMContentLoaded', function () {
+            const fiValor = document.getElementById('amount');
+
+            fiValor.addEventListener('input', function () {
+                let value = this.value.replace(/\D/g, ''); // Remove caracteres não numéricos
+                value = (value / 100).toFixed(2); // Divide por 100 e fixa duas casas decimais
+                value = value.replace('.', ','); // Substitui ponto por vírgula
+                value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Adiciona pontos como separadores de milhar
+                this.value = 'R$ ' + value; // Adiciona o símbolo da moeda
+            });
+
+            fiValor.addEventListener('focus', function () {
+                this.value = this.value.replace('R$ ', '').replace(/\./g, '').replace(',', '.'); // Remove formatação ao focar
+            });
+
+            fiValor.addEventListener('blur', function () {
+                let value = this.value.replace(/\D/g, ''); // Remove caracteres não numéricos
+                if (value) {
+                    value = (value / 100).toFixed(2); // Divide por 100 e fixa duas casas decimais
+                    value = value.replace('.', ','); // Substitui ponto por vírgula
+                    value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Adiciona pontos como separadores de milhar
+                    this.value = 'R$ ' + value; // Adiciona o símbolo da moeda
+                }
+            });
+        });
+    </script>
+
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Gerar QR Code</h1>
+        <form id="qrForm" class="form-inline justify-content-center">
+            <div class="form-group mb-2">
+                <label for="pixKey" class="sr-only">Chave Pix</label>
+                <input type="text" class="form-control" id="pixKey" placeholder="Chave Pix" required>
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="description" class="sr-only">Descrição</label>
+                <input type="text" class="form-control" id="description" placeholder="Descrição" required>
+            </div>
+            <div class="form-group mb-2">
+                <label for="merchantName" class="sr-only">Nome do Comerciante</label>
+                <input type="text" class="form-control" id="merchantName" placeholder="Nome do Comerciante" required>
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="merchantCity" class="sr-only">Cidade do Comerciante</label>
+                <input type="text" class="form-control" id="merchantCity" placeholder="Cidade do Comerciante" required>
+            </div>
+            <div class="form-group mb-2">
+                <label for="txid" class="sr-only">ID da Transação</label>
+                <input type="text" class="form-control" id="txid" placeholder="ID da Transação" required>
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="amount" class="sr-only">Valor</label>
+                <input type="tel" step="0.01" class="form-control" id="amount" name="amount"
+                    placeholder="Digite o valor" onfocus="this.type='tel'" onblur="this.type='text'"required>
+            </div>
+            <button type="button" class="btn btn-custom mb-2" id="generate">Gerar QR Code</button>
+        </form>
+        <div class="qr-code d-none" id="result">
+            <h2>QR Code Gerado:</h2>
+            <div id="qrCode"></div>
+            <h3>Código Pix:</h3>
+            <p id="pixCode" style="word-break: break-word;"></p>
+            <button class="btn btn-secondary" onclick="window.print()">Imprimir</button>
+            <button class="btn btn-primary" id="copyPixCode">Copiar Código Pix</button>
+        </div>
+        <div class="alert alert-info d-none" role="alert" id="info">
+            O QR Code gerado pode ser escaneado para realizar pagamentos via Pix.
+            <br>Certifique-se de que todos os campos estão preenchidos corretamente antes de gerar o QR Code.
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('#generate').click(function() {
+                var pixKey = $('#pixKey').val();
+                var description = $('#description').val();
+                var merchantName = $('#merchantName').val();
+                var merchantCity = $('#merchantCity').val();
+                var txid = $('#txid').val();
+                var amount = $('#amount').val();
+                // Remove tudo que não for número ou vírgula/ponto
+                amount = amount.replace(/[^\d,\.]/g, '');
+                // Troca vírgula por ponto
+                amount = amount.replace(',', '.');
+                
+                if (pixKey === '' || description === '' || merchantName === '' || merchantCity === '' || txid === '' || amount === '') {
+                    alert('Por favor, preencha todos os campos.');
+                    return;
+                }
+
+                $.ajax({
+                    url: 'generate.php',
+                    type: 'POST',
+                    data: { 
+                        pixKey: pixKey, 
+                        description: description, 
+                        merchantName: merchantName, 
+                        merchantCity: merchantCity, 
+                        txid: txid, 
+                        amount: amount 
+                    },
+                    success: function(response) {
+                        // Exibe o QR Code gerado
+                        $('#qrCode').html('<img src="' + response.qrCode + '" alt="QR Code">');
+                        
+                        // Exibe o código Pix
+                        $('#pixCode').text(response.pixCode);
+
+                        // Mostra os elementos de resultado
+                        $('#result').removeClass('d-none');
+                        $('#info').removeClass('d-none');
+                    },
+                    error: function() {
+                        alert('Erro ao gerar o QR Code. Tente novamente.');
+                    }
+                });
+            });
+
+            // Função para copiar o código Pix para o clipboard
+            $('#copyPixCode').click(function() {
+                var pixCode = $('#pixCode').text();
+                if (pixCode) {
+                    navigator.clipboard.writeText(pixCode).then(function() {
+                        alert('Código Pix copiado para a área de transferência!');
+                    }).catch(function(err) {
+                        alert('Erro ao copiar o código Pix: ' + err);
+                    });
+                } else {
+                    alert('Nenhum código Pix disponível para copiar.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
