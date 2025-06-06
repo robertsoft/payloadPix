@@ -39,7 +39,7 @@ Este projeto é uma aplicação web para geração de QR Codes do tipo Payload P
 
 ```sh
 git clone https://github.com/robertsoft/payloadPix.git
-cd payload-pix-qrcode
+cd payloadPix
 
  Instale as dependências PHP
 composer install
