@@ -6,7 +6,9 @@
         }
     },
     "description": "Biblioteca para geração do payload e QR Code estático do pix com PHP.",
+    "version": "1.0.0",
     "type": "library",
+    "license": "MIT",
     "authors": [
         {
             "name": "Robert Soft",
@@ -14,7 +16,6 @@
         }
         ],
     "require": {
-        "robertsoft/pix": "^1.0",
         "mpdf/qrcode": "^1.2"
     }
 }
